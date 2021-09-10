@@ -494,8 +494,7 @@ cdef class Loop:
         # never deallocate during the run -- so we do some
         # manual refs management.
         Py_INCREF(self)
-        with nogil:
-            err = uv.uv_run(self.uvloop, mode)
+        err = uv.uv_run(self.uvloop, mode)
         Py_DECREF(self)
 
         if err < 0:

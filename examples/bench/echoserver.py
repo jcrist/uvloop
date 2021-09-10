@@ -5,6 +5,7 @@ import os.path
 import pathlib
 import socket
 import ssl
+import threading
 
 
 PRINT = 0
@@ -107,6 +108,7 @@ if __name__ == '__main__':
     parser.add_argument('--print', default=False, action='store_true')
     parser.add_argument('--ssl', default=False, action='store_true')
     parser.add_argument('--buffered', default=False, action='store_true')
+    parser.add_argument('--gil', default=False, action='store_true')
     args = parser.parse_args()
 
     if args.uvloop:
@@ -155,6 +157,17 @@ if __name__ == '__main__':
         if hasattr(server_context, 'check_hostname'):
             server_context.check_hostname = False
         server_context.verify_mode = ssl.CERT_NONE
+
+    if args.gil:
+        print("adding GIL contention")
+
+        def spin():
+            while True:
+                pass
+
+        t = threading.Thread(target=spin)
+        t.daemon = True
+        t.start()
 
     if args.streams:
         if args.proto:
